@@ -16,8 +16,15 @@ canvas.pack()
 # goes through the board
 for y, row in enumerate(board):
     for x, value in enumerate(row):
-        # i will work on this next to make it change colors base on the space
-        color = 'blue' if value == ' ' else 'green'
+        if value == " ":
+            if neighbors(board,"water",x,y,n) == 1:
+                color = "#0ec7c1"
+            elif neighbors(board,"water",x,y,n) == 2 or neighbors(board,"water",x,y,n) == 3:
+                color = "#0e80c7"
+            else:
+                color = "blue"
+        else:
+            color = 'green'
         canvas.create_rectangle(x*square_size, y*square_size, (x+1)*square_size, (y+1)*square_size, fill=color)
 
 root.mainloop()
