@@ -83,6 +83,7 @@ def board(n):
                 board[r][c] = '\033[91m#\033[37m'
             elif board[r][c] == 9:
                 board[r][c] = '\033[92m#\033[37m'
+    return board # i add this to return the board
 def boardPrint(n):
     for i in range(n+2):
         print('_',end=' ')
