@@ -1,7 +1,6 @@
 import random
-while True:
+def board(n):
     board = []
-    n = int(input(':'))
     terNum = (n**2)*1//5
     if n <= 8:
         conNum = random.randint(3,5)
@@ -22,6 +21,8 @@ while True:
         for i in range(len(conTerNum)):
             conTerNum[i]+=random.randint(0,2)
             conTerNum[i]-=random.randint(0,2)
+
+
     for r in range(n*3//5):
         tempList = []
         for c in range(n):
@@ -82,15 +83,14 @@ while True:
                 board[r][c] = '\033[91m#\033[37m'
             elif board[r][c] == 9:
                 board[r][c] = '\033[92m#\033[37m'
-    def boardPrint():
-        for i in range(n+2):
-            print('_',end=' ')
-        print()
-        for r in range(n*3//5):
-            print('|',end=' ')
-            for c in range(n):
-                print(board[r][c],end=' ')
-            print('|')
-        for j in range(n+2):
-            print('_',end=' ')
-    boardPrint()
+def boardPrint(n):
+    for i in range(n+2):
+        print('_',end=' ')
+    print()
+    for r in range(n*3//5):
+        print('|',end=' ')
+        for c in range(n):
+            print(board[r][c],end=' ')
+        print('|')
+    for j in range(n+2):
+        print('_',end=' ')
