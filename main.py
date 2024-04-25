@@ -2,7 +2,8 @@ import tkinter as tk
 from Risk import board
 from Risk import neighbors
 # generates a board form the risk.py
-board = board(65)
+n = 60
+board = board(n)
 
 root = tk.Tk()
 root.title("risk")
