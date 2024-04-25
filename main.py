@@ -1,5 +1,6 @@
 import tkinter as tk
 from Risk import board
+from Risk import neighbors
 # generates a board form the risk.py
 board = board(65)
 
