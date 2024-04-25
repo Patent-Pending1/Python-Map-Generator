@@ -95,3 +95,33 @@ def boardPrint(n):
         print('|')
     for j in range(n+2):
         print('_',end=' ')
+def neighbors(grid,type,x,y,n):
+   if type == "water":
+        # Checks for 1 away
+        one_step_checks = [(y - 1, x), (y + 1, x), (y, x - 1), (y, x + 1)]
+        for row, col in one_step_checks:
+            if 0 <= row < len(grid) and 0 <= col < len(grid[0]):
+                if grid[row][col] != ' ':
+                    return 1 
+
+        # check for 2 away
+        two_step_checks = [
+            (y - 2, x), (y + 2, x), (y, x - 2), (y, x + 2),
+            (y - 1, x - 1), (y - 1, x + 1), (y + 1, x - 1), (y + 1, x + 1)
+        ]
+        for row, col in two_step_checks:
+            if 0 <= row < len(grid) and 0 <= col < len(grid[0]):
+                if grid[row][col] != ' ':
+                    return 2
+        #check for 3 away
+        three_step_checks = [
+            (y - 3, x), (y + 3, x), (y, x - 3), (y, x + 3),
+            (y - 2, x - 1), (y - 2, x + 1), (y + 2, x - 1), (y + 2, x + 1),
+            (y - 1, x - 2), (y - 1, x + 2), (y + 1, x - 2), (y + 1, x + 2)
+        ]
+        for row, col in three_step_checks:
+            if 0 <= row < len(grid) and 0 <= col < len(grid[0]):
+                if grid[row][col] != ' ':
+                    #adds a 50/50 to make it more random
+                    if random.randint(1,2) == 1:
+                        return 3 
