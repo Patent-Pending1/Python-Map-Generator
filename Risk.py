@@ -1,26 +1,22 @@
 import random
 def Board(n):
     board = []
-    terNum = (n**2)*1//5
-    if n <= 20:
-        conNum = random.randint(2,4)
-    elif n > 20 and n < 40:
-        conNum = random.randint(5,8)
-    else:
-        conNum = random.randint(6,10)
+    terNum = (n**(3/2))
+    #^^^Temporary placeholder values, must change later
+    conNum = random.randint(6,15)
+    #^^^"
     conWeight = []
     for i in range(conNum):
-        conWeight.append(random.randint(1,4))
+        conWeight.append(random.randint(1,n//15))
     tempWeight = 0
     for i in range(len(conWeight)):
         tempWeight += conWeight[i]
     conTerNum = []
     for i in range(conNum):
         conTerNum.append((terNum//tempWeight)*conWeight[i])
-    if n >= 8:
-        for i in range(len(conTerNum)):
-            conTerNum[i]+=random.randint(0,2)
-            conTerNum[i]-=random.randint(0,2)
+    for i in range(len(conTerNum)):
+        conTerNum[i]+=random.randint(0,2)
+        conTerNum[i]-=random.randint(0,2)
     for r in range(n*3//5):
         tempList = []
         for c in range(n):
@@ -29,9 +25,9 @@ def Board(n):
     nodeList = []
     blackList = []
     def tListGen():
-        tList = [random.randint(2,(n*3//5)-3), random.randint(2,n-3)]
+        tList = [random.randint(1,(n*3//5)-2), random.randint(1,n)-2]
         while tList in blackList:
-            tList = [random.randint(2,(n*3//5)-3), random.randint(2,n-3)]
+            tList = [random.randint(1,(n*3//5)-2), random.randint(1,n)-2]
         return tList 
     for i in range(conNum):
         tList = tListGen()
@@ -40,9 +36,13 @@ def Board(n):
         failNum = 0
         count = 0
         cNode = nodeList[i]
+        rNode = nodeList[i]
+        failMax = n*(n//20)
         while count < conTerNum[i]:
-            if failNum > n*3:
+            if failNum > failMax:
                 break
+            if count%5 == 0 and rNode != cNode:
+                rNode = cNode
             if count > 5:
                 a = random.randint(int(cNode[0])-1,int(cNode[0])+1)%(n*3//5)
                 b = random.randint(int(cNode[1])-1,int(cNode[1])+1)%n
@@ -60,36 +60,17 @@ def Board(n):
                 board[a][b] = i
                 blackList.append([a,b])
                 count+=1
+            elif board[a][b] == i:
+                cNode = [a,b]
             else:
                 failNum+=1
+                cNode = rNode
         for i in range(n*3//5):
             for j in range(n):
                 if board[i][j] != ' ':
                     for r in range(3):
                             for c in range(3):
                                 blackList.append([(i+1-r)%(n*3//5),(j+1-c)%n])
-    for r in range(n*3//5):
-        for c in range(n):
-            if board[r][c] == 0:
-                board[r][c] = '\033[30m#\033[37m'
-            elif board[r][c] == 1:
-                board[r][c] = '\033[31m#\033[37m'
-            elif board[r][c] == 2:
-                board[r][c] = '\033[32m#\033[37m'
-            elif board[r][c] == 3:
-                board[r][c] = '\033[33m#\033[37m'
-            elif board[r][c] == 4:
-                board[r][c] = '\033[34m#\033[37m'
-            elif board[r][c] == 5:
-                board[r][c] = '\033[35m#\033[37m'
-            elif board[r][c] == 6:
-                board[r][c] = '\033[36m#\033[37m'
-            elif board[r][c] == 7:
-                board[r][c] = '\033[37m#\033[37m'
-            elif board[r][c] == 8:
-                board[r][c] = '\033[91m#\033[37m'
-            elif board[r][c] == 9:
-                board[r][c] = '\033[92m#\033[37m'
     return board
 def boardPrint(n):
     board = Board(n)
