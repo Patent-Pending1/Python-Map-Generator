@@ -1,15 +1,15 @@
 import tkinter as tk
-from Risk import board
+from Risk import Board
 from Risk import neighbors
 # generates a board form the risk.py
-n = 60
-board = board(n)
+n = 100
+board = Board(n)
 
 root = tk.Tk()
 root.title("risk")
 
 # this set the size of the square make it what ever
-square_size = 10
+square_size = 1
 
 # random tk stuff (did not steal from there webstie)
 canvas = tk.Canvas(root, width=len(board[0])*square_size, height=len(board)*square_size)
