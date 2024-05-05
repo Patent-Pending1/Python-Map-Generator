@@ -1,9 +1,9 @@
 import random
 def Board(n):
     board = []
-    terNum = (n**(3/2))
+    terNum = (n*(n*3//5))*(60/100)
     #^^^Temporary placeholder values, must change later
-    conNum = random.randint(6,15)
+    conNum = random.randint(4,8)
     #^^^"
     conWeight = []
     for i in range(conNum):
@@ -62,6 +62,7 @@ def Board(n):
                 count+=1
             elif board[a][b] == i:
                 cNode = [a,b]
+                count+=1
             else:
                 failNum+=1
                 cNode = rNode
@@ -92,7 +93,6 @@ def neighbors(grid,type,x,y,n):
             if 0 <= row < len(grid) and 0 <= col < len(grid[0]):
                 if grid[row][col] != ' ':
                     return 1 
-
         # check for 2 away
         two_step_checks = [
             (y - 2, x), (y + 2, x), (y, x - 2), (y, x + 2),
