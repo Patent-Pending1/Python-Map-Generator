@@ -64,13 +64,12 @@ class Generation():
                         for r in range(3):
                                 for c in range(3):
                                     blackList.append([(i+1-r)%(n*3//5),(j+1-c)%n])
-        #>>>
-        #Connor, can you add something here that makes it so that every tile bordering the outside of the
-        #generated "land" also becomes "land"?(just set all of these newly added "land" points on the board
-        #to "%", i'm going to use this later). I put the comment here because the call should only do this
-        #one time
-        #thanks
-        #>>>
+        #this is my amaazing code
+        for y, row in enumerate(board):
+            for x, value in enumerate(row):
+                if value == ' ':
+                    if neighbors(board, "otherWater", x, y, n) == 1:
+                        board[y][x] = "%"
         return board
     def forest(n):
         board = Generation.continents(n)
@@ -125,7 +124,7 @@ def boardPrint(n):
         print('|')
     for j in range(n+2):
         print('_',end=' ')
-def neighbors(grid,type,x,y,n):
+def neighbors(grid,type,x,y,n,):
     if type == "water":
         # Checks for 1 away
         one_step_checks = [(y - 1, x), (y + 1, x), (y, x - 1), (y, x + 1)]
@@ -154,3 +153,9 @@ def neighbors(grid,type,x,y,n):
                     #adds a 50/50 to make it more random
                     if random.randint(1,2) == 1:
                         return 3
+    elif type == "otherWater":
+        one_step_checks = [(y - 1, x), (y + 1, x), (y, x - 1), (y, x + 1)]
+        for row, col in one_step_checks:
+            if 0 <= row < len(grid) and 0 <= col < len(grid[0]):
+                if grid[row][col] != ' ' and grid[row][col] != '%':
+                    return 1 
