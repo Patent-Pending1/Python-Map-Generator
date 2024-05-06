@@ -1,15 +1,15 @@
 import tkinter as tk
-from Risk import Board
+from Risk import Generation
 from Risk import neighbors
 # generates a board form the risk.py
-n = 60
-board = Board(n)
+n = 200
+board = Generation.finalGen(n)
 
 root = tk.Tk()
 root.title("risk")
 
 # this set the size of the square make it what ever
-square_size = 10
+square_size = 5
 
 # random tk stuff (did not steal from there webstie)
 canvas = tk.Canvas(root, width=len(board[0])*square_size, height=len(board)*square_size)
@@ -25,6 +25,8 @@ for y, row in enumerate(board):
                 color = "#0e80c7"
             else:
                 color = "blue"
+        elif value == '#':
+            color = '#013220'
         else:
             color = 'green'
         canvas.create_rectangle(x*square_size, y*square_size, (x+1)*square_size, (y+1)*square_size, fill=color)
