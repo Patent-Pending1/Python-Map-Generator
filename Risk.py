@@ -77,14 +77,33 @@ class Generation():
         for r in range(n*3//5):
             for c in range(n):
                 if board[r][c] != ' ' and [r,c] not in forestBList:
-                    target = random.randint(1,n)
-                    number = random.randint(1,n)
-                    diff = abs(number-target)
-                    depoNum = 0
-                    if diff < 3:
-                        depoNum = number - diff
-                    elif diff == 0:
-                        depoNum = number
+                    if ((r > (n*3//5)*(5/8) or r < (n*3//5)*(3/8)) and (c > (n*5//8) or c < (n*3//8))) or ((r > (n*3//5)*(2/3) or r < (n*3//5)*(1/3)) and (c > (n*2//3) or c < (n*1//3))):
+                        target = random.randint(1,n*2)
+                        number = random.randint(1,n*2)
+                        diff = abs(number-target)
+                        depoNum = 0
+                        if diff < 3:
+                            depoNum = (number//3) - diff
+                        elif diff == 0:
+                            depoNum = number*2//3
+                    elif ((r <= (n*3//5)*(5/8) and r >= (n*3//5)*(3/8)) and (c <= (n*5//8) and c >= (n*3//8))) or ((r <= (n*3//5)*(2/3) and r >= (n*3//5)*(1/3)) and (c <= (n*2//3) and c >= (n*1//3))):
+                        target = random.randint(1,n)
+                        number = random.randint(1,n)
+                        diff = abs(number-target)
+                        depoNum = 0
+                        if diff < 3:
+                            depoNum = (number//4) - diff
+                        elif diff == 0:
+                            depoNum = number*2//3
+                    else:
+                        target = random.randint(1,n)
+                        number = random.randint(1,n)
+                        diff = abs(number-target)
+                        depoNum = 0
+                        if diff < 3:
+                            depoNum = (number//4) - diff
+                        elif diff == 0:
+                            depoNum = number*2//3
                     rNode = [r,c]
                     cNode = rNode
                     count = 0
@@ -108,9 +127,32 @@ class Generation():
                             cNode = rNode
                             count += 1
         return board
+    def tundra(n):
+        board = Generation.forest(n)
+        northLine = []
+        southLine = []
+        nIceLine = []
+        sIceLine = []
+        for c in range(n):
+            tNorth = (n*3//5)*(7/8) + random.randint(0,2) - random.randint(0,2)
+            northLine.append(tNorth)
+            tSouth = (n*3//5)*(1/8) + random.randint(0,2) - random.randint(0,2)
+            southLine.append(tSouth)
+            tNIce = (n*3//5)*(11/12) + random.randint(0,3) - random.randint(0,3)
+            nIceLine.append(tNorth)
+            tSIce = (n*3//5)*(1/12) + random.randint(0,3) - random.randint(0,3)
+            sIceLine.append(tSouth)
+        for r in range(n*3//5):
+            for c in range(n):
+                if (r > northLine[c] or r < southLine[c]) and board[r][c] != ' ':
+                    board[r][c] = '!'
+                #if (r > nIceLine[c] or r < sIceLine[c]) and board[r][c] == ' ':
+                    #board[r][c] = 'I'
+        return board
     def finalGen(n):
         board = Generation.continents(n)
         board = Generation.forest(n)
+        board = Generation.tundra(n)
         return board
 def boardPrint(n):
     board = Generation.continents(n)
