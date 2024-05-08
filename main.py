@@ -2,7 +2,7 @@ import tkinter as tk
 from Risk import Generation
 from Risk import neighbors
 # generates a board form the risk.py
-n = 100
+n = 200
 board = Generation.finalGen(n)
 root = tk.Tk()
 root.title("risk")
@@ -19,20 +19,23 @@ for y, row in enumerate(board):
     for x, value in enumerate(row):
         if value == " ":
             if neighbors(board,"water",x,y,n) == 1:
-                color = "lightYellow"
+                if y > (n*3//5)*(1/4) and y < (n*3//5)*(3/4):
+                    color = "lightYellow"
+                else:
+                    color = "#414040"
             elif neighbors(board,"water",x,y,n) == 2 or neighbors(board,"water",x,y,n) == 3:
                 color = "#0e80c7"
             else:
-                color = "blue"
+                color = "#003186"
         elif value == '#' or value == '##':
             color = '#013220'
         elif value == '!':
             color = 'white'
         elif value == 'I':
-            color = 'lightBlue'
+            color = '#7390B5'
         elif value == '&':
             color == 'brown'
-        else:
+        elif value == '0' or value == '%':
             color = 'green'
         canvas.create_rectangle(x*square_size, y*square_size, (x+1)*square_size, (y+1)*square_size, fill=color)
 
