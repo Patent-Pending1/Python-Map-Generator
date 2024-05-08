@@ -5,7 +5,7 @@ class Generation():
     def continents(n):
         height = n*3//5
         board = []
-        terNum = (n*height)*(80/100)
+        terNum = (n*height)*(100/100)
         conNum = random.randint(4,10)
         conWeight = []
         for i in range(conNum):
