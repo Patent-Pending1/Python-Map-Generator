@@ -20,7 +20,7 @@ for y, row in enumerate(board):
         if value == " ":
             if neighbors(board,"water",x,y,n) == 1:
                 if y > (n*3//5)*(1/4) and y < (n*3//5)*(3/4):
-                    color = "lightYellow"
+                    color = "#F6F693"
                 else:
                     color = "#414040"
             elif neighbors(board,"water",x,y,n) == 2 or neighbors(board,"water",x,y,n) == 3:
@@ -30,13 +30,13 @@ for y, row in enumerate(board):
         elif value == '#' or value == '##':
             color = '#013220'
         elif value == '!':
-            color = 'white'
+            color = '#FFFFFF'
         elif value == 'I':
             color = '#7390B5'
         elif value == '&':
-            color == 'brown'
+            color == '#86622B'
         elif value == '0' or value == '%':
-            color = 'green'
+            color = '#027D00'
         canvas.create_rectangle(x*square_size, y*square_size, (x+1)*square_size, (y+1)*square_size, fill=color)
 
 root.mainloop()
