@@ -34,7 +34,7 @@ class Generation():
         for i in range(conNum):
             tList = tListGen()
             nodeList.append(tList)
-            board[nodeList[i][0]][nodeList[i][1]] = i
+            board[nodeList[i][0]][nodeList[i][1]] = '0'
             failNum = 0
             count = 0
             cNode = nodeList[i]
@@ -50,10 +50,10 @@ class Generation():
                 for m in range(8):
                     if board[a][b] == ' ' and [a,b] not in blackList:
                         cNode = [a,b]
-                        board[a][b] = i
+                        board[a][b] = '0'
                         blackList.append([a,b])
                         count+=1
-                if board[a][b] == i:
+                if board[a][b] == '0':
                     cNode = [a,b]
                     count+=1
                 else:
@@ -88,15 +88,6 @@ class Generation():
                         depoNum = 0
                         if diff < 3:
                             depoNum = (number//3) - diff
-                        elif diff == 0:
-                            depoNum = number*2//3
-                    elif ((r <= height*(5/8) and r >= height*(3/8)) and (c <= (n*5//8) and c >= (n*3//8))) or ((r <= height*(2/3) and r >= height*(1/3)) and (c <= (n*2//3) and c >= (n*1//3))):
-                        target = random.randint(1,n)
-                        number = random.randint(1,n)
-                        diff = abs(number-target)
-                        depoNum = 0
-                        if diff < 3:
-                            depoNum = (number//4) - diff
                         elif diff == 0:
                             depoNum = number*2//3
                     else:
@@ -174,17 +165,19 @@ class Generation():
                 if board[r][c] != ' ' and [r,c] not in badlandsBList:
                     if board[r][c] == '!' or board[r][c] == 'I':
                         continue
-                    target = random.randint(1,n*3)
-                    number = random.randint(1,n*3)
+                    target = random.randint(1,n*2)
+                    number = random.randint(1,n*2)
                     diff = abs(number-target)
                     depoNum = 0
-                    if diff <= 3:
-                        depoNum = number//2
+                    if diff < 3:
+                        depoNum = (number//3) - diff
+                    elif diff == 0:
+                        depoNum = number*2//3
                     rNode = [r,c]
                     cNode = rNode
                     count = 0
                     while count < depoNum:
-                        if count%5 == 0 and rNode != cNode:
+                        if count % 5 == 0 and rNode != cNode:
                             cNode = rNode
                             a = random.randint(int(cNode[0])-1,int(cNode[0])+1)%height
                             b = random.randint(int(cNode[1])-1,int(cNode[1])+1)%n
@@ -192,23 +185,17 @@ class Generation():
                             cNode = rNode
                         a = random.randint(int(cNode[0])-1,int(cNode[0])+1)%height
                         b = random.randint(int(cNode[1])-1,int(cNode[1])+1)%n
-                        if board[a][b] != ' ' and [a,b] not in badlandsBList:
-                            if board[a][b] == '#':
-                                remove = random.randint(0,2)
-                                if remove == 1 or remove == 2:
-                                    board[a][b] = '&'
-                                    cNode = [a,b]
-                                    badlandsBList.append(cNode)
-                                    count+=1
-                                else:
-                                    cNode = [a,b]
-                                    badlandsBList.append(cNode)
-                                    count+=1
-                            else:
+                        if board[a][b] == '#' and [a,b] not in badlandsBList:
+                            replace = random.randint(0,2)
+                            if replace != 0:
                                 board[a][b] = '&'
-                                cNode = [a,b]
-                                badlandsBList.append(cNode)
-                                count+=1
+                            cNode = [a,b]
+                            badlandsBList.append(cNode)
+                            count+=1
+                        elif board[a][b] != ' ' and [a,b] not in badlandsBList:
+                            board[a][b] = '&'
+                            cNode = [a,b]
+                            badlandsBList.append(cNode)
                         elif board[a][b] == '&':
                             cNode = [a,b]
                         else:
@@ -216,10 +203,7 @@ class Generation():
                             count += 1
         return board
     def finalGen(n):
-        board = Generation.continents(n)
-        board = Generation.forest(n)
         board = Generation.tundra(n)
-        #board = Generation.badlands(n)
         return board
 def neighbors(grid,type,x,y,n,):
     if type == "water":
@@ -254,5 +238,5 @@ def neighbors(grid,type,x,y,n,):
         one_step_checks = [(y - 1, x), (y + 1, x), (y, x - 1), (y, x + 1)]
         for row, col in one_step_checks:
             if 0 <= row < len(grid) and 0 <= col < len(grid[0]):
-                if grid[row][col] != ' ' and grid[row][col] != '%' and grid[row][col] != 'I':
+                if grid[row][col] != ' ' and grid[row][col] != '%':
                     return 1
