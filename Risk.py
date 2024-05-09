@@ -165,14 +165,12 @@ class Generation():
                 if board[r][c] != ' ' and [r,c] not in badlandsBList:
                     if board[r][c] == '!' or board[r][c] == 'I':
                         continue
-                    target = random.randint(1,n*2)
-                    number = random.randint(1,n*2)
+                    target = random.randint(n*2,n*4)
+                    number = random.randint(n*2,n*4)
                     diff = abs(number-target)
                     depoNum = 0
-                    if diff < 3:
-                        depoNum = (number//3) - diff
-                    elif diff == 0:
-                        depoNum = number*2//3
+                    if diff == 0:
+                        depoNum = number
                     rNode = [r,c]
                     cNode = rNode
                     count = 0
@@ -185,7 +183,7 @@ class Generation():
                             cNode = rNode
                         a = random.randint(int(cNode[0])-1,int(cNode[0])+1)%height
                         b = random.randint(int(cNode[1])-1,int(cNode[1])+1)%n
-                        if board[a][b] == '#' and [a,b] not in badlandsBList:
+                        if board[a][b] == '#' and board[a][b] != '!' and board[a][b] != 'I' and [a,b] not in badlandsBList:
                             replace = random.randint(0,2)
                             if replace != 0:
                                 board[a][b] = '&'
@@ -203,7 +201,7 @@ class Generation():
                             count += 1
         return board
     def finalGen(n):
-        board = Generation.tundra(n)
+        board = Generation.badlands(n)
         return board
 def neighbors(grid,type,x,y,n,):
     if type == "water":
