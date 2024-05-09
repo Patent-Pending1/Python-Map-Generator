@@ -8,7 +8,7 @@ root = tk.Tk()
 root.title("risk")
 
 # this set the size of the square make it what ever
-square_size = 5
+square_size = 4
 
 # random tk stuff (did not steal from there webstie)
 canvas = tk.Canvas(root, width=len(board[0])*square_size, height=len(board)*square_size)
@@ -29,12 +29,12 @@ for y, row in enumerate(board):
                 color = "#003186"
         elif value == '#' or value == '##':
             color = '#013220'
-        elif value == '!':
+        elif value == '!' or value == '!!':
             color = '#FFFFFF'
         elif value == 'I':
             color = '#7390B5'
         elif value == '&':
-            color = '#86622B'
+            color = '#52471D'
         elif value == '0' or value == '%':
             color = '#027D00'
         canvas.create_rectangle(x*square_size, y*square_size, (x+1)*square_size, (y+1)*square_size, fill=color)
