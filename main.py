@@ -34,7 +34,7 @@ for y, row in enumerate(board):
         elif value == 'I':
             color = '#7390B5'
         elif value == '&':
-            color == '#86622B'
+            color = '#86622B'
         elif value == '0' or value == '%':
             color = '#027D00'
         canvas.create_rectangle(x*square_size, y*square_size, (x+1)*square_size, (y+1)*square_size, fill=color)
