@@ -72,14 +72,75 @@ class Generation():
                     if neighbors(board, "otherWater", x, y, n) == 1:
                         board[y][x] = "%"
         return board
-    def forest(n):
+    def badlands(n):
         height = n*3//5
         board = Generation.continents(n)
+        badlandsBList = []
+        for r in range(height):
+            for c in range(n):
+                if board[r][c] != ' ' and [r,c] not in badlandsBList:
+                    target = random.randint(n*4,n*8)
+                    number = random.randint(n*4,n*8)
+                    diff = abs(number-target)
+                    depoNum = 0
+                    if diff == 0:
+                        depoNum = number*2
+                    rNode = [r,c]
+                    cNode = rNode
+                    count = 0
+                    while count < depoNum:
+                        if count % 5 == 0 and rNode != cNode:
+                            cNode = rNode
+                            a = random.randint(int(cNode[0])-1,int(cNode[0])+1)%height
+                            b = random.randint(int(cNode[1])-1,int(cNode[1])+1)%n
+                            rNode = [a,b]
+                            cNode = rNode
+                        a = random.randint(int(cNode[0])-1,int(cNode[0])+1)%height
+                        b = random.randint(int(cNode[1])-1,int(cNode[1])+1)%n
+                        if board[a][b] != ' ' and [a,b] not in badlandsBList:
+                            board[a][b] = '&'
+                            cNode = [a,b]
+                            badlandsBList.append(cNode)
+                            count+=1
+                        elif board[a][b] == '&':
+                            cNode = [a,b]
+                        else:
+                            cNode = rNode
+                            count += 1
+        return board
+    def tundra(n):
+        height = n*3//5
+        board = Generation.badlands(n)
+        northLine = []
+        southLine = []
+        nIceLine = []
+        sIceLine = []
+        for c in range(n):
+            tNorth = height*(7/8) + random.randint(0,2) - random.randint(0,2)
+            northLine.append(tNorth)
+            tSouth = height*(1/8) + random.randint(0,2) - random.randint(0,2)
+            southLine.append(tSouth)
+            tNIce = height*(24/25) + random.randint(0,3) - random.randint(0,3)
+            nIceLine.append(tNIce)
+            tSIce = height*(1/25) + random.randint(0,3) - random.randint(0,3)
+            sIceLine.append(tSIce)
+        for r in range(height):
+            for c in range(n):
+                if (r > nIceLine[c] or r < sIceLine[c]) and board[r][c] == ' ':
+                    board[r][c] = 'I'
+                elif (r > nIceLine[c] or r < sIceLine[c]) and board[r][c] != ' ':
+                    board[r][c] = '!!'
+                elif (r > northLine[c] or r < southLine[c]) and board[r][c] != ' ':
+                    board[r][c] = '!'
+        return board
+    def forest(n):
+        height = n*3//5
+        board = Generation.tundra(n)
         forestBList = []
         for r in range(height):
             for c in range(n):
                 if board[r][c] != ' ' and [r,c] not in forestBList:
-                    if r > height*(15/16) or r < height*(1/16):
+                    if board[r][c] == '!!':
                         continue
                     if ((r > height*(2/3) or r < height*(1/3)) and (c > (n*3//4) or c < (n*1//4))) or ((r > height*(2/3) or r < height*(1/3)) and (c > (n*2//3) or c < (n*1//3))):
                         target = random.randint(1,n*2)
@@ -111,97 +172,32 @@ class Generation():
                             cNode = rNode
                         a = random.randint(int(cNode[0])-1,int(cNode[0])+1)%height
                         b = random.randint(int(cNode[1])-1,int(cNode[1])+1)%n
+                        if board[a][b] == '!!':
+                            cNode = rNode
+                            count+=1
+                            continue
                         if board[a][b] != ' ' and [a,b] not in forestBList:
-                            if r < height*(7/8) and r > height*(1/8):
+                            if board[a][b] == '!':
+                                remove = random.randint(0,1)
+                                if remove == 0:
+                                    board[a][b] = '#'
+                            elif board[a][b] == '&':
+                                remove = random.randint(0,2)
+                                if remove == 0:
+                                    board[a][b] = '#'
+                            else:
                                 board[a][b] = '#'
-                            elif (r >= height*(7/8) and r <= height) or (r <= height*(1/8) and r >= 0):
-                                board[a][b] = '##'
                             cNode = [a,b]
                             forestBList.append(cNode)
                             count+=1
-                        elif board[a][b] == '#' or board[a][b] == '##':
-                            cNode = [a,b]
-                        else:
-                            cNode = rNode
-                            count += 1
-        return board
-    def tundra(n):
-        height = n*3//5
-        board = Generation.forest(n)
-        northLine = []
-        southLine = []
-        nIceLine = []
-        sIceLine = []
-        for c in range(n):
-            tNorth = height*(7/8) + random.randint(0,2) - random.randint(0,2)
-            northLine.append(tNorth)
-            tSouth = height*(1/8) + random.randint(0,2) - random.randint(0,2)
-            southLine.append(tSouth)
-            tNIce = height*(24/25) + random.randint(0,3) - random.randint(0,3)
-            nIceLine.append(tNIce)
-            tSIce = height*(1/25) + random.randint(0,3) - random.randint(0,3)
-            sIceLine.append(tSIce)
-        for r in range(height):
-            for c in range(n):
-                if (r > nIceLine[c] or r < sIceLine[c]) and board[r][c] != ' ':
-                    if board[r][c] == '##':
-                        board[r][c] = '!'
-                if (r > northLine[c] or r < southLine[c]) and board[r][c] != ' ':
-                    if board[r][c] == '##':
-                        remove = random.randint(0,1)
-                        if remove == 1:
-                            board[r][c] = '!'
-                    else:
-                        board[r][c] = '!'
-                elif (r > nIceLine[c] or r < sIceLine[c]) and board[r][c] == ' ':
-                    board[r][c] = 'I'
-        return board
-    def badlands(n):
-        height = n*3//5
-        board = Generation.tundra(n)
-        badlandsBList = []
-        for r in range(height):
-            for c in range(n):
-                if board[r][c] != ' ' and [r,c] not in badlandsBList:
-                    if board[r][c] == '!' or board[r][c] == 'I':
-                        continue
-                    target = random.randint(n*2,n*4)
-                    number = random.randint(n*2,n*4)
-                    diff = abs(number-target)
-                    depoNum = 0
-                    if diff == 0:
-                        depoNum = number
-                    rNode = [r,c]
-                    cNode = rNode
-                    count = 0
-                    while count < depoNum:
-                        if count % 5 == 0 and rNode != cNode:
-                            cNode = rNode
-                            a = random.randint(int(cNode[0])-1,int(cNode[0])+1)%height
-                            b = random.randint(int(cNode[1])-1,int(cNode[1])+1)%n
-                            rNode = [a,b]
-                            cNode = rNode
-                        a = random.randint(int(cNode[0])-1,int(cNode[0])+1)%height
-                        b = random.randint(int(cNode[1])-1,int(cNode[1])+1)%n
-                        if board[a][b] == '#' and board[a][b] != '!' and board[a][b] != 'I' and [a,b] not in badlandsBList:
-                            replace = random.randint(0,2)
-                            if replace != 0:
-                                board[a][b] = '&'
-                            cNode = [a,b]
-                            badlandsBList.append(cNode)
-                            count+=1
-                        elif board[a][b] != ' ' and [a,b] not in badlandsBList:
-                            board[a][b] = '&'
-                            cNode = [a,b]
-                            badlandsBList.append(cNode)
-                        elif board[a][b] == '&':
+                        elif board[a][b] == '#':
                             cNode = [a,b]
                         else:
                             cNode = rNode
                             count += 1
         return board
     def finalGen(n):
-        board = Generation.badlands(n)
+        board = Generation.forest(n)
         return board
 def neighbors(grid,type,x,y,n,):
     if type == "water":
