@@ -84,7 +84,7 @@ class Generation():
                     diff = abs(number-target)
                     depoNum = 0
                     if diff == 0 or diff == 1:
-                        depoNum = nunmber*8
+                        depoNum = number*8
                     rNode = [r,c]
                     cNode = rNode
                     count = 0
