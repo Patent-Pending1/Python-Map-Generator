@@ -79,12 +79,12 @@ class Generation():
         for r in range(height):
             for c in range(n):
                 if board[r][c] != ' ' and [r,c] not in badlandsBList:
-                    target = random.randint(n*4,n*8)
-                    number = random.randint(n*4,n*8)
+                    target = random.randint(0,n*16)
+                    number = random.randint(0,n*16)
                     diff = abs(number-target)
                     depoNum = 0
-                    if diff == 0:
-                        depoNum = number*2
+                    if diff == 0 or diff == 1:
+                        depoNum = nunmber*8
                     rNode = [r,c]
                     cNode = rNode
                     count = 0
@@ -140,7 +140,7 @@ class Generation():
         for r in range(height):
             for c in range(n):
                 if board[r][c] != ' ' and [r,c] not in forestBList:
-                    if board[r][c] == '!!':
+                    if board[r][c] == '!!' or board[r][c] == 'I':
                         continue
                     if ((r > height*(2/3) or r < height*(1/3)) and (c > (n*3//4) or c < (n*1//4))) or ((r > height*(2/3) or r < height*(1/3)) and (c > (n*2//3) or c < (n*1//3))):
                         target = random.randint(1,n*2)
@@ -176,7 +176,7 @@ class Generation():
                             cNode = rNode
                             count+=1
                             continue
-                        if board[a][b] != ' ' and [a,b] not in forestBList:
+                        if board[a][b] != ' ' and board[a][b] != 'I' and [a,b] not in forestBList:
                             if board[a][b] == '!':
                                 remove = random.randint(0,1)
                                 if remove == 0:
