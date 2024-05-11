@@ -32,9 +32,10 @@ class Generation():
                 tList = [random.randint(1,height-2), random.randint(1,n)-2]
             return tList 
         for i in range(conNum):
+            value = '0'
             tList = tListGen()
             nodeList.append(tList)
-            board[nodeList[i][0]][nodeList[i][1]] = '0'
+            board[nodeList[i][0]][nodeList[i][1]] = value
             failNum = 0
             count = 0
             cNode = nodeList[i]
@@ -50,10 +51,11 @@ class Generation():
                 for m in range(8):
                     if board[a][b] == ' ' and [a,b] not in blackList:
                         cNode = [a,b]
-                        board[a][b] = '0'
+                        board[a][b] = value
                         blackList.append([a,b])
                         count+=1
-                if board[a][b] == '0':
+                        break
+                if board[a][b] == value:
                     cNode = [a,b]
                     count+=1
                 else:
@@ -78,35 +80,37 @@ class Generation():
         badlandsBList = []
         for r in range(height):
             for c in range(n):
-                if board[r][c] != ' ' and [r,c] not in badlandsBList:
-                    target = random.randint(0,n*16)
-                    number = random.randint(0,n*16)
-                    diff = abs(number-target)
-                    depoNum = 0
-                    if diff == 0 or diff == 1:
-                        depoNum = number*8
-                    rNode = [r,c]
-                    cNode = rNode
-                    count = 0
-                    while count < depoNum:
-                        if count % 5 == 0 and rNode != cNode:
-                            cNode = rNode
-                            a = random.randint(int(cNode[0])-1,int(cNode[0])+1)%height
-                            b = random.randint(int(cNode[1])-1,int(cNode[1])+1)%n
-                            rNode = [a,b]
-                            cNode = rNode
+                depoNum = 0
+                if r > height*5/8 or r < height*3/8:
+                    if board[r][c] != ' ' and [r,c] not in badlandsBList:
+                        target = random.randint(n*12,n*18)
+                        number = random.randint(n*12,n*18)
+                        diff = abs(number-target)
+                        depoNum = 0
+                        if diff == 0 or diff == 1:
+                            depoNum = number*8
+                rNode = [r,c]
+                cNode = rNode
+                count = 0
+                while count < depoNum:
+                    if count % 5 == 0 and rNode != cNode:
+                        cNode = rNode
                         a = random.randint(int(cNode[0])-1,int(cNode[0])+1)%height
                         b = random.randint(int(cNode[1])-1,int(cNode[1])+1)%n
-                        if board[a][b] != ' ' and [a,b] not in badlandsBList:
-                            board[a][b] = '&'
-                            cNode = [a,b]
-                            badlandsBList.append(cNode)
-                            count+=1
-                        elif board[a][b] == '&':
-                            cNode = [a,b]
-                        else:
-                            cNode = rNode
-                            count += 1
+                        rNode = [a,b]
+                        cNode = rNode
+                    a = random.randint(int(cNode[0])-1,int(cNode[0])+1)%height
+                    b = random.randint(int(cNode[1])-1,int(cNode[1])+1)%n
+                    if board[a][b] != ' ' and [a,b] not in badlandsBList:
+                        board[a][b] = '&'
+                        cNode = [a,b]
+                        badlandsBList.append(cNode)
+                        count+=1
+                    elif board[a][b] == '&':
+                        cNode = [a,b]
+                    else:
+                        cNode = rNode
+                        count += 1
         return board
     def tundra(n):
         height = n*3//5
@@ -133,14 +137,55 @@ class Generation():
                 elif (r > northLine[c] or r < southLine[c]) and board[r][c] != ' ':
                     board[r][c] = '!'
         return board
+    def desert(n):
+            height = n*3//5
+            board = Generation.tundra(n)
+            desertBList = []
+            for r in range(height):
+                for c in range(n):
+                    depoNum = 0
+                    if r < height*5/8 and r > height*3/8:
+                        if board[r][c] != ' ' and [r,c] not in desertBList:
+                            target = random.randint(n*16,n*32)
+                            number = random.randint(n*16,n*32)
+                            diff = abs(number-target)
+                            depoNum = 0
+                            if diff == 0:
+                                depoNum = number*6
+                    rNode = [r,c]
+                    cNode = rNode
+                    count = 0
+                    while count < depoNum:
+                        if count % 5 == 0 and rNode != cNode:
+                            cNode = rNode
+                            a = random.randint(int(cNode[0])-1,int(cNode[0])+1)%height
+                            b = random.randint(int(cNode[1])-1,int(cNode[1])+1)%n
+                            rNode = [a,b]
+                            cNode = rNode
+                        a = random.randint(int(cNode[0])-1,int(cNode[0])+1)%height
+                        b = random.randint(int(cNode[1])-1,int(cNode[1])+1)%n
+                        if board[a][b] != ' ' and [a,b] not in desertBList:
+                            board[a][b] = '@'
+                            cNode = [a,b]
+                            desertBList.append(cNode)
+                            count+=1
+                        elif board[a][b] == '@':
+                            cNode = [a,b]
+                        else:
+                            cNode = rNode
+                            count += 1
+            return board
+class Deposit():
+    def __init__(self,n):
+        self.n = n
     def forest(n):
         height = n*3//5
-        board = Generation.tundra(n)
+        board = Generation.desert(n)
         forestBList = []
         for r in range(height):
             for c in range(n):
                 if board[r][c] != ' ' and [r,c] not in forestBList:
-                    if board[r][c] == '!!' or board[r][c] == 'I':
+                    if board[r][c] == '!!' or board[r][c] == 'I' or board[r][c] == '@':
                         continue
                     if ((r > height*(2/3) or r < height*(1/3)) and (c > (n*3//4) or c < (n*1//4))) or ((r > height*(2/3) or r < height*(1/3)) and (c > (n*2//3) or c < (n*1//3))):
                         target = random.randint(1,n*2)
@@ -176,6 +221,10 @@ class Generation():
                             cNode = rNode
                             count+=1
                             continue
+                        elif board[a][b] == '%':
+                            cNode = rNode
+                            count+=1
+                            continue
                         if board[a][b] != ' ' and board[a][b] != 'I' and [a,b] not in forestBList:
                             if board[a][b] == '!':
                                 remove = random.randint(0,1)
@@ -196,9 +245,10 @@ class Generation():
                             cNode = rNode
                             count += 1
         return board
-    def finalGen(n):
-        board = Generation.forest(n)
-        return board
+def finalGen(n):
+    board = Generation.badlands(n)
+    board = Deposit.forest(n)
+    return board
 def neighbors(grid,type,x,y,n,):
     if type == "water":
         # Checks for 1 away
