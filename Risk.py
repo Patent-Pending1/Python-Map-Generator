@@ -1,7 +1,5 @@
 import random
 class Generation():
-    def __init__(self,n):
-        self.n = n
     def continents(n):
         height = n*3//5
         board = []
@@ -138,46 +136,40 @@ class Generation():
                     board[r][c] = '!'
         return board
     def desert(n):
-            height = n*3//5
-            board = Generation.tundra(n)
-            desertBList = []
-            for r in range(height):
-                for c in range(n):
-                    depoNum = 0
-                    if r < height*5/8 and r > height*3/8:
-                        if board[r][c] != ' ' and [r,c] not in desertBList:
-                            target = random.randint(n*16,n*32)
-                            number = random.randint(n*16,n*32)
-                            diff = abs(number-target)
-                            depoNum = 0
-                            if diff == 0:
-                                depoNum = number*6
-                    rNode = [r,c]
+        height = n*3//5
+        board = Generation.tundra(n)
+        desertBList = []
+        desertPresent = random.randint(0,2)
+        for i in range(desertPresent):
+            r,c = random.randint(height*3//8,height*5//8),random.randint(0,n-1)
+            while board[r][c] == ' ':
+                r,c = random.randint(height*3//8,height*5//8),random.randint(0,n-1)
+            depoNum = random.randint(n,n)
+        #the values that bound the ^ randint function here have no bearing on the actual size of the desert
+            rNode = [r,c]
+            cNode = rNode
+            count = 0
+            while count < depoNum:
+                if count % 5 == 0 and rNode != cNode:
                     cNode = rNode
-                    count = 0
-                    while count < depoNum:
-                        if count % 5 == 0 and rNode != cNode:
-                            cNode = rNode
-                            a = random.randint(int(cNode[0])-1,int(cNode[0])+1)%height
-                            b = random.randint(int(cNode[1])-1,int(cNode[1])+1)%n
-                            rNode = [a,b]
-                            cNode = rNode
-                        a = random.randint(int(cNode[0])-1,int(cNode[0])+1)%height
-                        b = random.randint(int(cNode[1])-1,int(cNode[1])+1)%n
-                        if board[a][b] != ' ' and [a,b] not in desertBList:
-                            board[a][b] = '@'
-                            cNode = [a,b]
-                            desertBList.append(cNode)
-                            count+=1
-                        elif board[a][b] == '@':
-                            cNode = [a,b]
-                        else:
-                            cNode = rNode
-                            count += 1
-            return board
+                    a = random.randint(int(cNode[0])-1,int(cNode[0])+1)%height
+                    b = random.randint(int(cNode[1])-1,int(cNode[1])+1)%n
+                    rNode = [a,b]
+                    cNode = rNode
+                a = random.randint(int(cNode[0])-1,int(cNode[0])+1)%height
+                b = random.randint(int(cNode[1])-1,int(cNode[1])+1)%n
+                if board[a][b] != ' ' and [a,b] not in desertBList:
+                    board[a][b] = '@'
+                    cNode = [a,b]
+                    desertBList.append(cNode)
+                    count+=1
+                elif board[a][b] == '@':
+                    cNode = [a,b]
+                else:
+                    cNode = rNode
+                    count+=1
+        return board
 class Deposit():
-    def __init__(self,n):
-        self.n = n
     def forest(n):
         height = n*3//5
         board = Generation.desert(n)
@@ -217,11 +209,7 @@ class Deposit():
                             cNode = rNode
                         a = random.randint(int(cNode[0])-1,int(cNode[0])+1)%height
                         b = random.randint(int(cNode[1])-1,int(cNode[1])+1)%n
-                        if board[a][b] == '!!':
-                            cNode = rNode
-                            count+=1
-                            continue
-                        elif board[a][b] == '%':
+                        if board[a][b] == '!!' or board[a][b] == '%' or board[a][b] == '@':
                             cNode = rNode
                             count+=1
                             continue
@@ -246,7 +234,6 @@ class Deposit():
                             count += 1
         return board
 def finalGen(n):
-    board = Generation.badlands(n)
     board = Deposit.forest(n)
     return board
 def neighbors(grid,type,x,y,n,):
