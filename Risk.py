@@ -1,151 +1,91 @@
 import random
-class Generation():
-    def continents(n):
-        height = n*3//5
-        board = []
-        terNum = (n*height)*(100/100)
-        conNum = random.randint(4,10)
-        conWeight = []
-        for i in range(conNum):
-            conWeight.append(random.randint(1,n//15))
-        tempWeight = 0
-        for i in range(len(conWeight)):
-            tempWeight += conWeight[i]
-        conTerNum = []
-        for i in range(conNum):
-            conTerNum.append((terNum//tempWeight)*conWeight[i])
-        for i in range(len(conTerNum)):
-            conTerNum[i]+=random.randint(0,2)
-            conTerNum[i]-=random.randint(0,2)
-        for r in range(height):
-            tempList = []
-            for c in range(n):
-                tempList.append(' ')
-            board.append(tempList)
-        nodeList = []
-        blackList = []
-        def tListGen():
-            tList = [random.randint(1,height-2), random.randint(1,n)-2]
-            while tList in blackList:
-                tList = [random.randint(1,height-2), random.randint(1,n)-2]
-            return tList 
-        for i in range(conNum):
-            value = '0'
-            tList = tListGen()
-            nodeList.append(tList)
-            board[nodeList[i][0]][nodeList[i][1]] = value
-            failNum = 0
-            count = 0
-            cNode = nodeList[i]
-            rNode = nodeList[i]
-            failMax = n*(n//20)
-            while count < conTerNum[i]:
-                if failNum > failMax:
-                    break
-                if count%5 == 0 and rNode != cNode:
-                    rNode = cNode
-                a = random.randint(int(cNode[0])-1,int(cNode[0])+1)%height
-                b = random.randint(int(cNode[1])-1,int(cNode[1])+1)%n
-                for m in range(8):
-                    if board[a][b] == ' ' and [a,b] not in blackList:
-                        cNode = [a,b]
-                        board[a][b] = value
-                        blackList.append([a,b])
-                        count+=1
-                        break
-                if board[a][b] == value:
-                    cNode = [a,b]
-                    count+=1
-                else:
-                    failNum+=1
-                    cNode = rNode
-            for i in range(height):
-                for j in range(n):
-                    if board[i][j] != ' ':
-                        for r in range(3):
-                                for c in range(3):
-                                    blackList.append([(i+1-r)%height,(j+1-c)%n])
-        #this is my amaazing code
-        for y, row in enumerate(board):
-            for x, value in enumerate(row):
-                if value == ' ':
-                    if neighbors(board, "otherWater", x, y, n) == 1:
-                        board[y][x] = "%"
-        return board
-    def badlands(n):
-        height = n*3//5
-        board = Generation.continents(n)
-        badlandsBList = []
-        for r in range(height):
-            for c in range(n):
-                depoNum = 0
-                if r > height*5/8 or r < height*3/8:
-                    if board[r][c] != ' ' and [r,c] not in badlandsBList:
-                        target = random.randint(n*12,n*18)
-                        number = random.randint(n*12,n*18)
-                        diff = abs(number-target)
-                        depoNum = 0
-                        if diff == 0 or diff == 1:
-                            depoNum = number*8
-                rNode = [r,c]
-                cNode = rNode
-                count = 0
-                while count < depoNum:
-                    if count % 5 == 0 and rNode != cNode:
-                        cNode = rNode
-                        a = random.randint(int(cNode[0])-1,int(cNode[0])+1)%height
-                        b = random.randint(int(cNode[1])-1,int(cNode[1])+1)%n
-                        rNode = [a,b]
-                        cNode = rNode
-                    a = random.randint(int(cNode[0])-1,int(cNode[0])+1)%height
-                    b = random.randint(int(cNode[1])-1,int(cNode[1])+1)%n
-                    if board[a][b] != ' ' and [a,b] not in badlandsBList:
-                        board[a][b] = '&'
-                        cNode = [a,b]
-                        badlandsBList.append(cNode)
-                        count+=1
-                    elif board[a][b] == '&':
-                        cNode = [a,b]
-                    else:
-                        cNode = rNode
-                        count += 1
-        return board
-    def tundra(n):
-        height = n*3//5
-        board = Generation.badlands(n)
-        northLine = []
-        southLine = []
-        nIceLine = []
-        sIceLine = []
+def continents(n):
+    height = n*3//5
+    board = []
+    terNum = (n*height)*(100/100)
+    conNum = random.randint(4,10)
+    conWeight = []
+    for i in range(conNum):
+        conWeight.append(random.randint(1,n//15))
+    tempWeight = 0
+    for i in range(len(conWeight)):
+        tempWeight += conWeight[i]
+    conTerNum = []
+    for i in range(conNum):
+        conTerNum.append((terNum//tempWeight)*conWeight[i])
+    for i in range(len(conTerNum)):
+        conTerNum[i]+=random.randint(0,2)
+        conTerNum[i]-=random.randint(0,2)
+    for r in range(height):
+        tempList = []
         for c in range(n):
-            tNorth = height*(7/8) + random.randint(0,2) - random.randint(0,2)
-            northLine.append(tNorth)
-            tSouth = height*(1/8) + random.randint(0,2) - random.randint(0,2)
-            southLine.append(tSouth)
-            tNIce = height*(24/25) + random.randint(0,3) - random.randint(0,3)
-            nIceLine.append(tNIce)
-            tSIce = height*(1/25) + random.randint(0,3) - random.randint(0,3)
-            sIceLine.append(tSIce)
-        for r in range(height):
-            for c in range(n):
-                if (r > nIceLine[c] or r < sIceLine[c]) and board[r][c] == ' ':
-                    board[r][c] = 'I'
-                elif (r > nIceLine[c] or r < sIceLine[c]) and board[r][c] != ' ':
-                    board[r][c] = '!!'
-                elif (r > northLine[c] or r < southLine[c]) and board[r][c] != ' ':
-                    board[r][c] = '!'
-        return board
-    def desert(n):
-        height = n*3//5
-        board = Generation.tundra(n)
-        desertBList = []
-        desertPresent = random.randint(0,2)
-        for i in range(desertPresent):
-            r,c = random.randint(height*3//8,height*5//8),random.randint(0,n-1)
-            while board[r][c] == ' ':
-                r,c = random.randint(height*3//8,height*5//8),random.randint(0,n-1)
-            depoNum = random.randint(n,n)
-        #the values that bound the ^ randint function here have no bearing on the actual size of the desert
+            tempList.append(' ')
+        board.append(tempList)
+    nodeList = []
+    blackList = []
+    def tListGen():
+        tList = [random.randint(1,height-2), random.randint(1,n)-2]
+        while tList in blackList:
+            tList = [random.randint(1,height-2), random.randint(1,n)-2]
+        return tList 
+    for i in range(conNum):
+        value = '0'
+        tList = tListGen()
+        nodeList.append(tList)
+        board[nodeList[i][0]][nodeList[i][1]] = value
+        failNum = 0
+        count = 0
+        cNode = nodeList[i]
+        rNode = nodeList[i]
+        failMax = n*(n//20)
+        while count < conTerNum[i]:
+            if failNum > failMax:
+                break
+            if count%5 == 0 and rNode != cNode:
+                rNode = cNode
+            a = random.randint(int(cNode[0])-1,int(cNode[0])+1)%height
+            b = random.randint(int(cNode[1])-1,int(cNode[1])+1)%n
+            for m in range(8):
+                if board[a][b] == ' ' and [a,b] not in blackList:
+                    cNode = [a,b]
+                    board[a][b] = value
+                    blackList.append([a,b])
+                    count+=1
+                    break
+            if board[a][b] == value:
+                cNode = [a,b]
+                count+=1
+            else:
+                failNum+=1
+                cNode = rNode
+        for i in range(height):
+            for j in range(n):
+                if board[i][j] != ' ':
+                    for r in range(3):
+                            for c in range(3):
+                                blackList.append([(i+1-r)%height,(j+1-c)%n])
+    #this is my amaazing code
+    for y, row in enumerate(board):
+        for x, value in enumerate(row):
+            if value == ' ':
+                if neighbors(board, "otherWater", x, y, n) == 1:
+                    board[y][x] = "%"
+    return board
+def badlands(n):
+    height = n*3//5
+    board = continents(n)
+    badlandsBList = []
+    for r in range(height):
+        for c in range(n):
+            depoNum = 0
+            if r > height*5/8 or r < height*3/8:
+                if board[r][c] != ' ' and [r,c] not in badlandsBList:
+                    target = random.randint(n*12,n*18)
+                    number = random.randint(n*12,n*18)
+                    diff = abs(number-target)
+                    depoNum = 0
+                    if diff == 0 or diff == 1:
+                        depoNum = number*8
             rNode = [r,c]
             cNode = rNode
             count = 0
@@ -158,83 +98,142 @@ class Generation():
                     cNode = rNode
                 a = random.randint(int(cNode[0])-1,int(cNode[0])+1)%height
                 b = random.randint(int(cNode[1])-1,int(cNode[1])+1)%n
-                if board[a][b] != ' ' and [a,b] not in desertBList:
-                    board[a][b] = '@'
+                if board[a][b] != ' ' and [a,b] not in badlandsBList:
+                    board[a][b] = '&'
                     cNode = [a,b]
-                    desertBList.append(cNode)
+                    badlandsBList.append(cNode)
                     count+=1
-                elif board[a][b] == '@':
+                elif board[a][b] == '&':
                     cNode = [a,b]
                 else:
                     cNode = rNode
-                    count+=1
-        return board
-class Deposit():
-    def forest(n):
-        height = n*3//5
-        board = Generation.desert(n)
-        forestBList = []
-        for r in range(height):
-            for c in range(n):
-                if board[r][c] != ' ' and [r,c] not in forestBList:
-                    if board[r][c] == '!!' or board[r][c] == 'I' or board[r][c] == '@':
-                        continue
-                    if ((r > height*(2/3) or r < height*(1/3)) and (c > (n*3//4) or c < (n*1//4))) or ((r > height*(2/3) or r < height*(1/3)) and (c > (n*2//3) or c < (n*1//3))):
-                        target = random.randint(1,n*2)
-                        number = random.randint(1,n*2)
-                        diff = abs(number-target)
-                        depoNum = 0
-                        if diff < 3:
-                            depoNum = (number//3) - diff
-                        elif diff == 0:
-                            depoNum = number*2//3
-                    else:
-                        target = random.randint(1,n)
-                        number = random.randint(1,n)
-                        diff = abs(number-target)
-                        depoNum = 0
-                        if diff < 3:
-                            depoNum = (number//4) - diff
-                        elif diff == 0:
-                            depoNum = number*2//3
-                    rNode = [r,c]
-                    cNode = rNode
-                    count = 0
-                    while count < depoNum:
-                        if count%5 == 0 and rNode != cNode:
-                            cNode = rNode
-                            a = random.randint(int(cNode[0])-1,int(cNode[0])+1)%height
-                            b = random.randint(int(cNode[1])-1,int(cNode[1])+1)%n
-                            rNode = [a,b]
-                            cNode = rNode
+                    count += 1
+    return board
+def tundra(n):
+    height = n*3//5
+    board = badlands(n)
+    northLine = []
+    southLine = []
+    nIceLine = []
+    sIceLine = []
+    for c in range(n):
+        tNorth = height*(7/8) + random.randint(0,2) - random.randint(0,2)
+        northLine.append(tNorth)
+        tSouth = height*(1/8) + random.randint(0,2) - random.randint(0,2)
+        southLine.append(tSouth)
+        tNIce = height*(24/25) + random.randint(0,3) - random.randint(0,3)
+        nIceLine.append(tNIce)
+        tSIce = height*(1/25) + random.randint(0,3) - random.randint(0,3)
+        sIceLine.append(tSIce)
+    for r in range(height):
+        for c in range(n):
+            if (r > nIceLine[c] or r < sIceLine[c]) and board[r][c] == ' ':
+                board[r][c] = 'I'
+            elif (r > nIceLine[c] or r < sIceLine[c]) and board[r][c] != ' ':
+                board[r][c] = '!!'
+            elif (r > northLine[c] or r < southLine[c]) and board[r][c] != ' ':
+                board[r][c] = '!'
+    return board
+def desert(n):
+    height = n*3//5
+    board = tundra(n)
+    desertBList = []
+    desertPresent = random.randint(0,2)
+    depoNum = 0
+    for i in range(desertPresent):
+        r,c = random.randint(height*3//8,height*5//8),random.randint(0,n-1)
+        while board[r][c] == ' ':
+            r,c = random.randint(height*3//8,height*5//8),random.randint(0,n-1)
+        depoNum = random.randint(n*12,n*20)
+    #the values that bound the ^ randint function here have no bearing on the actual size of the desert
+        rNode = [r,c]
+        cNode = rNode
+        count = 0
+        while count < depoNum:
+            if count % 5 == 0 and rNode != cNode:
+                cNode = rNode
+                a = random.randint(int(cNode[0])-1,int(cNode[0])+1)%height
+                b = random.randint(int(cNode[1])-1,int(cNode[1])+1)%n
+                rNode = [a,b]
+                cNode = rNode
+            a = random.randint(int(cNode[0])-1,int(cNode[0])+1)%height
+            b = random.randint(int(cNode[1])-1,int(cNode[1])+1)%n
+            if (board[a][b] == '0' or board[a][b] == '%' or board[a][b] == '&') and [a,b] not in desertBList:
+                board[a][b] = '@'
+                cNode = [a,b]
+                desertBList.append(cNode)
+                count+=1
+            elif board[a][b] == '@':
+                cNode = [a,b]
+            else:
+                cNode = rNode
+                count+=1
+    return board
+def forest(n):
+    height = n*3//5
+    board = desert(n)
+    forestBList = []
+    for r in range(height):
+        for c in range(n):
+            if board[r][c] != ' ' and [r,c] not in forestBList:
+                if board[r][c] == '!!' or board[r][c] == 'I' or board[r][c] == '@':
+                    continue
+                if ((r > height*(2/3) or r < height*(1/3)) and (c > (n*3//4) or c < (n*1//4))) or ((r > height*(2/3) or r < height*(1/3)) and (c > (n*2//3) or c < (n*1//3))):
+                    target = random.randint(1,n*2)
+                    number = random.randint(1,n*2)
+                    diff = abs(number-target)
+                    depoNum = 0
+                    if diff < 3:
+                        depoNum = (number//3) - diff
+                    elif diff == 0:
+                        depoNum = number*2//3
+                else:
+                    target = random.randint(1,n)
+                    number = random.randint(1,n)
+                    diff = abs(number-target)
+                    depoNum = 0
+                    if diff < 3:
+                        depoNum = (number//4) - diff
+                    elif diff == 0:
+                        depoNum = number*2//3
+                rNode = [r,c]
+                cNode = rNode
+                count = 0
+                while count < depoNum:
+                    if count%5 == 0 and rNode != cNode:
+                        cNode = rNode
                         a = random.randint(int(cNode[0])-1,int(cNode[0])+1)%height
                         b = random.randint(int(cNode[1])-1,int(cNode[1])+1)%n
-                        if board[a][b] == '!!' or board[a][b] == '%' or board[a][b] == '@':
-                            cNode = rNode
-                            count+=1
-                            continue
-                        if board[a][b] != ' ' and board[a][b] != 'I' and [a,b] not in forestBList:
-                            if board[a][b] == '!':
-                                remove = random.randint(0,1)
-                                if remove == 0:
-                                    board[a][b] = '#'
-                            elif board[a][b] == '&':
-                                remove = random.randint(0,2)
-                                if remove == 0:
-                                    board[a][b] = '#'
-                            else:
+                        rNode = [a,b]
+                        cNode = rNode
+                    a = random.randint(int(cNode[0])-1,int(cNode[0])+1)%height
+                    b = random.randint(int(cNode[1])-1,int(cNode[1])+1)%n
+                    if board[a][b] == '!!' or board[a][b] == '%' or board[a][b] == '@':
+                        cNode = rNode
+                        count+=1
+                        continue
+                    if board[a][b] != ' ' and board[a][b] != 'I' and [a,b] not in forestBList:
+                        if board[a][b] == '!':
+                            remove = random.randint(0,1)
+                            if remove == 0:
                                 board[a][b] = '#'
-                            cNode = [a,b]
-                            forestBList.append(cNode)
-                            count+=1
-                        elif board[a][b] == '#':
-                            cNode = [a,b]
+                        elif board[a][b] == '&':
+                            remove = random.randint(0,2)
+                            if remove == 0:
+                                board[a][b] = '#'
                         else:
-                            cNode = rNode
-                            count += 1
-        return board
+                            board[a][b] = '#'
+                        cNode = [a,b]
+                        forestBList.append(cNode)
+                        count+=1
+                    elif board[a][b] == '#':
+                        cNode = [a,b]
+                    else:
+                        cNode = rNode
+                        count += 1
+    return board
 def finalGen(n):
-    board = Deposit.forest(n)
+    board = forest(n)
     return board
 def neighbors(grid,type,x,y,n,):
     if type == "water":
