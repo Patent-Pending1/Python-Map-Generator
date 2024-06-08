@@ -1,28 +1,42 @@
 import random
 class Generation():
+
+    #'n' is the horizontal side length of the canvas
+
+    #the aspect ratio of the canvas is by default 5:3, this is the fraction in the 'height' variable
+
+    #'landValue' is the amount of land scaling from 0 being none to 100 being almost 100%
+    #avoid setting this number higher than 100 as overflow errors may prevent proper generation
+    #default is 30
+    #recommended value range is 20-50, any higher and certain generation features become too prominent,
+    #any lower and the visible majority of the map is water
+    
+    #'string' is the number that, when changed, most affected the "stringyness" of the final generation
+    #as the number increases, the stringyness of the output generally does as well, this is NOT a hard
+    #rule however, and low numbers may generate high stringyness and vice versa
+    #'string' MUST NOT have a value of 0, this will return an error generation
+    #setting 'string' to 1 entirely randomizes the stringyness of the output
+    #it is set to 5 by default
+
     def continents(n):
         #determines features and values of the final generation
+        landValue = 30
+        string = 5
         height = n*3//5
         board = []
-        #'landValue' is the amount of land scaling from 0 being none to 100 being almost 100%
-        #avoid setting this number higher than 100 as overflow errors may prevent proper generation
-        landValue = 50
-        terNum = (n*height)*(landValue/200)
-        conNum = random.randint(4,10)
+        terNum = (n*height)*(landValue/100)
+        conNum = random.randint(1,20)
         conWeight = []
         for i in range(conNum):
-            conWeight.append(random.randint(1,n//15))
-        tempWeight = 0
+            conWeight.append(random.randint(1,4))
+        totalWeight = 0
         for i in range(len(conWeight)):
-            tempWeight += conWeight[i]
+            totalWeight += conWeight[i]
         conTerNum = []
         #assigns each continent a number of territories based on total territory number and the weight of
         #that continent
         for i in range(conNum):
-            conTerNum.append((terNum//tempWeight)*conWeight[i])
-        for i in range(len(conTerNum)):
-            conTerNum[i]+=random.randint(0,2)
-            conTerNum[i]-=random.randint(0,2)
+            conTerNum.append((terNum//totalWeight)*conWeight[i])
         for r in range(height):
             tempList = []
             for c in range(n):
@@ -44,6 +58,7 @@ class Generation():
         #each generation uses the board that is modified by its preceding function
 
         #creates a "node" and builds a continent around it
+
         for i in range(conNum):
             value = i
             tList = tListGen()
@@ -57,7 +72,7 @@ class Generation():
             while count < conTerNum[i]:
                 if failNum > failMax:
                     break
-                if count%5 == 0 and rNode != cNode:
+                if count%string == 0 and rNode != cNode:
                     rNode = cNode
                 a = random.randint(int(cNode[0])-1,int(cNode[0])+1)%height
                 b = random.randint(int(cNode[1])-1,int(cNode[1])+1)%n
@@ -68,17 +83,11 @@ class Generation():
                         blackList.append([a,b])
                         count+=1
                         break
-                if board[a][b].count(value) == 1:
+                if board[a][b].count('+') == 1:
                     cNode = [a,b]
                 else:
                     failNum+=1
                     cNode = rNode
-            for i in range(height):
-                for j in range(n):
-                    if board[i][j].count('-') == 0:
-                        for r in range(3):
-                                for c in range(3):
-                                    blackList.append([(i+1-r)%height,(j+1-c)%n])
         #this is my amaazing code
         for y, row in enumerate(board):
             for x, value in enumerate(row):
@@ -88,10 +97,6 @@ class Generation():
         return board
     
     #changes some of the previously generated land to be "badlands" using a similar node method
-
-#FROM HERE DOWN NEEDS TO BE UPDATED TO LIST STORAGE
-#\/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/
-
     def badlands(n):
         height = n*3//5
         board = Generation.continents(n)
@@ -111,7 +116,7 @@ class Generation():
                 cNode = rNode
                 count = 0
                 while count < depoNum:
-                    if count % 5 == 0 and rNode != cNode:
+                    if count%5 == 0 and rNode != cNode:
                         cNode = rNode
                         a = random.randint(int(cNode[0])-1,int(cNode[0])+1)%height
                         b = random.randint(int(cNode[1])-1,int(cNode[1])+1)%n
@@ -151,12 +156,12 @@ class Generation():
             sIceLine.append(tSIce)
         for r in range(height):
             for c in range(n):
-                if (r > nIceLine[c] or r < sIceLine[c]) and board[r][c] == '-':
-                    board[r][c] = 'I'
+                if (r > nIceLine[c] or r < sIceLine[c]) and board[r][c].count('-') == 1:
+                    board[r][c].append('I')
                 elif (r > nIceLine[c] or r < sIceLine[c]) and board[r][c].count('-') == 0:
-                    board[r][c] = '!!'
+                    board[r][c].append('!!')
                 elif (r > northLine[c] or r < southLine[c]) and board[r][c].count('-') == 0:
-                    board[r][c] = '!'
+                    board[r][c].append('!')
         return board
     
     #creates a random number of large deserts based on "desertNum"
@@ -167,7 +172,7 @@ class Generation():
         desertNum = random.randint(0,3)
         for i in range(desertNum):
             r,c = random.randint(height*3//8,height*5//8),random.randint(0,n-1)
-            while board[r][c] == '-':
+            while board[r][c].count('-') == 1:
                 r,c = random.randint(height*3//8,height*5//8),random.randint(0,n-1)
             depoNum = random.randint(n*30,n*40)/(2000/n)
             rNode = [r,c]
@@ -175,7 +180,7 @@ class Generation():
             count = 0
             oceanCount = 0
             while count < depoNum:
-                if count % 5 == 0 and rNode != cNode:
+                if count%5 == 0 and rNode != cNode:
                     cNode = rNode
                     a = random.randint(int(cNode[0])-1,int(cNode[0])+1)%height
                     b = random.randint(int(cNode[1])-1,int(cNode[1])+1)%n
@@ -183,23 +188,24 @@ class Generation():
                     cNode = rNode
                 a = random.randint(int(cNode[0])-1,int(cNode[0])+1)%height
                 b = random.randint(int(cNode[1])-1,int(cNode[1])+1)%n
-                if board[a][b] == '-' or board[a][b] == '!' or board[a][b] == '!!':
+                if board[a][b].count('-') == 1 or board[a][b].count('!') == 1 or board[a][b].count('!!') == 1:
                     cNode = [r,c]
                     oceanCount+=1
                     if oceanCount >= depoNum*3:
                         break
                 elif board[a][b].count('-') == 0 and [a,b] not in desertBList:
-                    board[a][b] = '@'
+                    board[a][b].append('@')
                     cNode = [a,b]
                     desertBList.append(cNode)
                     count+=1
-                elif board[a][b] == '@':
+                elif board[a][b].count('@') == 1:
                     cNode = [a,b]
                 else:
                     cNode = rNode
         return board
     
     #first highly-sensitive function that has extremely specific generative restraints
+    #functions from here down do not follow a strict top-down hierarchy
     def forest(n):
         height = n*3//5
         board = Generation.desert(n)
@@ -207,7 +213,7 @@ class Generation():
         for r in range(height):
             for c in range(n):
                 if board[r][c].count('-') == 0 and [r,c] not in forestBList:
-                    if board[r][c] == '!!' or board[r][c] == 'I' or board[r][c] == '@':
+                    if board[r][c].count('!!') == 1 or board[r][c].count('I') == 1 or board[r][c].count('@') == 1:
                         continue
                     if ((r > height*(2/3) or r < height*(1/3)) and (c > (n*3//4) or c < (n*1//4))) or ((r > height*(2/3) or r < height*(1/3)) and (c > (n*2//3) or c < (n*1//3))):
                         target = random.randint(1,n*2)
@@ -239,25 +245,25 @@ class Generation():
                             cNode = rNode
                         a = random.randint(int(cNode[0])-1,int(cNode[0])+1)%height
                         b = random.randint(int(cNode[1])-1,int(cNode[1])+1)%n
-                        if board[a][b] == '!!' or board[a][b] == '%' or board[a][b] == '@':
+                        if board[a][b].count('!!') or board[a][b].count('%') == 1 or board[a][b].count('@') == 1:
                             cNode = rNode
                             count+=1
                             continue
-                        if board[a][b].count('-') == 0 and board[a][b] != 'I' and [a,b] not in forestBList:
-                            if board[a][b] == '!':
+                        if board[a][b].count('-') == 0 and board[a][b].count('I') == 0 and [a,b] not in forestBList:
+                            if board[a][b].count('!') == 1:
                                 remove = random.randint(0,1)
                                 if remove == 0:
-                                    board[a][b] = '#'
-                            elif board[a][b] == '&':
+                                    board[a][b].append('#')
+                            elif board[a][b].count('&') == 1:
                                 remove = random.randint(0,2)
                                 if remove == 0:
-                                    board[a][b] = '#'
+                                    board[a][b].append('#')
                             else:
-                                board[a][b] = '#'
+                                board[a][b].append('#')
                             cNode = [a,b]
                             forestBList.append(cNode)
                             count+=1
-                        elif board[a][b] == '#':
+                        elif board[a][b].count('#') == 1:
                             cNode = [a,b]
                         else:
                             cNode = rNode
@@ -265,10 +271,11 @@ class Generation():
         return board
     
 def finalGen(n):
-    board = Generation.continents(n)
+    board = Generation.forest(n)
     return board
 '''
 is there any way to make this code more efficient?
+\/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/
 '''
 def neighbors(grid,type,x,y,n,):
     if type == "water":
