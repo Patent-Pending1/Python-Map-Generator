@@ -12,20 +12,18 @@ class Generation():
     #any lower and the visible majority of the map is water
     
     #'string' is the number that, when changed, most affected the "stringyness" of the final generation
-    #as the number increases, the stringyness of the output generally does as well, this is NOT a hard
-    #rule however, and low numbers may generate high stringyness and vice versa
-    #'string' MUST NOT have a value of 0, this will return an error generation
-    #setting 'string' to 1 entirely randomizes the stringyness of the output
-    #it is set to 5 by default
+    #'string' scales from 1 to 5, with 1 being the highest stringyness and 5 the lowest
+    #'string' MUST NOT have a value of 0, this will return an error
+    #it is set to 3 by default
 
     def continents(n):
         #determines features and values of the final generation
-        landValue = 30
-        string = 5
+        landValue = 40
+        string = 3
         height = n*3//5
         board = []
         terNum = (n*height)*(landValue/100)
-        conNum = random.randint(1,20)
+        conNum = random.randint(4,8)
         conWeight = []
         for i in range(conNum):
             conWeight.append(random.randint(1,4))
@@ -54,7 +52,6 @@ class Generation():
         #such as Ice ('I'), all features after initial generation are done in land areas
 
         #for any given generation the number that denotes its size is "depoNum"
-
         #each generation uses the board that is modified by its preceding function
 
         #creates a "node" and builds a continent around it
@@ -73,7 +70,11 @@ class Generation():
                 if failNum > failMax:
                     break
                 if count%string == 0 and rNode != cNode:
-                    rNode = cNode
+                    cNode = rNode
+                    a = random.randint(int(cNode[0])-1,int(cNode[0])+1)%height
+                    b = random.randint(int(cNode[1])-1,int(cNode[1])+1)%n
+                    rNode = [a,b]
+                    cNode = rNode
                 a = random.randint(int(cNode[0])-1,int(cNode[0])+1)%height
                 b = random.randint(int(cNode[1])-1,int(cNode[1])+1)%n
                 for m in range(8):
