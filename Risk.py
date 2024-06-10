@@ -8,7 +8,7 @@ class Generation():
     #'landValue' is the amount of land scaling from 0 being none to 100 being almost 100%
     #avoid setting this number higher than 100 as overflow errors may prevent proper generation
     #default is 30
-    #recommended value range is 20-50, any higher and certain generation features become too prominent,
+    #recommended value range is 30-70, any higher and certain generation features become too prominent,
     #any lower and the visible majority of the map is water
     
     #'string' is the number that, when changed, most affected the "stringyness" of the final generation
@@ -18,8 +18,8 @@ class Generation():
 
     def continents(n):
         #determines features and values of the final generation
-        landValue = 40
-        string = 3
+        landValue = 60
+        string = 5
         height = n*3//5
         board = []
         terNum = (n*height)*(landValue/100)
@@ -67,6 +67,7 @@ class Generation():
             rNode = nodeList[i]
             failMax = n*(n//20)
             while count < conTerNum[i]:
+                overlapNum = 0
                 if failNum > failMax:
                     break
                 if count%string == 0 and rNode != cNode:
@@ -77,14 +78,19 @@ class Generation():
                     cNode = rNode
                 a = random.randint(int(cNode[0])-1,int(cNode[0])+1)%height
                 b = random.randint(int(cNode[1])-1,int(cNode[1])+1)%n
-                for m in range(8):
-                    if board[a][b].count('-') == 1 and [a,b] not in blackList:
-                        cNode = [a,b]
-                        board[a][b] = ['+',value]
-                        blackList.append([a,b])
-                        count+=1
-                        break
-                if board[a][b].count('+') == 1:
+                if board[a][b].count('-') == 1 and [a,b] not in blackList:
+                    cNode = [a,b]
+                    board[a][b] = ['+',value]
+                    blackList.append([a,b])
+                    count+=1
+                elif board[a][b].count('+') == 1 and board[a][b].count(value) == 0:
+                    cNode = [a,b]
+                    board[a][b].append(value)
+                    overlapNum+=1
+                    if overlapNum == 5:
+                        cNode = rNode
+                        overlapNum == 0
+                elif board[a][b].count(value) == 1 and len(board[a][b]) == 2:
                     cNode = [a,b]
                 else:
                     failNum+=1
@@ -97,10 +103,30 @@ class Generation():
                         board[y][x] = ['+','%']
         return board
     
+    #creates mountains based on overlapping continents
+    def mountains(n):
+        height = n*3//5
+        board = Generation.continents(n)
+        mountainBList = []
+        for r in range(height):
+            for c in range(n):
+                elevation = -1
+                for gen in board[r][c]:
+                    if isinstance(gen,int) == True:
+                        elevation+=1
+                for i in range(elevation):
+                    board[r][c].append('^')
+                if elevation > 0 and [r,c] not in mountainBList:
+                    for i in range(3):
+                        for j in range(3):
+                            board[(r+1-i)%height][(c+1-j)%n].append('^')
+                            mountainBList.append([(r+1-i)%height,(c+1-j)%n])
+        return board
+
     #changes some of the previously generated land to be "badlands" using a similar node method
     def badlands(n):
         height = n*3//5
-        board = Generation.continents(n)
+        board = Generation.mountains(n)
         badlandsBList = []
         for r in range(height):
             for c in range(n):
