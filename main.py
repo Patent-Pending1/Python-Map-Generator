@@ -33,6 +33,9 @@ for y, row in enumerate(board):
             else:
                 hexValues = ['#003186','#1B0794','#001A82']
                 color = choice(hexValues)
+        elif values.count('^') > 0:
+            e = str(6-values.count('^'))
+            color = '#'+e+'0'+e+'0'+e+'0'
         elif values.count('!') == 1 or values.count('!!') == 1:
             color = '#FFFFFF'
         elif values.count('@') == 1:
