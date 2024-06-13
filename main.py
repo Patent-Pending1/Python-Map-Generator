@@ -5,13 +5,13 @@ from Risk import Generation
 from Risk import neighbors
 from Risk import finalGen
 # generates a board form the risk.py
-n = 200
+n = 600
 board = finalGen(n)
 root = tk.Tk()
 root.title("risk")
 
 # this set the size of the square make it what ever
-square_size = 5
+square_size = 2
 
 # random tk stuff (did not steal from there webstie)
 canvas = tk.Canvas(root, width=len(board[0])*square_size, height=len(board)*square_size)
