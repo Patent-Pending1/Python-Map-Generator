@@ -68,6 +68,7 @@ class Generation():
             failMax = n*(n//20)
             while count < conTerNum[i]:
                 overlapNum = 0
+                strandFailNum = 0
                 if failNum > failMax:
                     break
                 if count%string == 0 and rNode != cNode:
@@ -95,6 +96,10 @@ class Generation():
                 else:
                     failNum+=1
                     cNode = rNode
+                    strandFailNum+=1
+                    if strandFailNum == 25:
+                        cNode = nodeList[i]
+                        strandFailNum = 0
         #this is my amaazing code
         for y, row in enumerate(board):
             for x, value in enumerate(row):
@@ -126,6 +131,8 @@ class Generation():
     #changes some of the previously generated land to be "badlands" using a similar node method
     def badlands(n):
         height = n*3//5
+        landValue = 60
+        terNum = n*height*landValue//100
         board = Generation.mountains(n)
         badlandsBList = []
         for r in range(height):
@@ -133,12 +140,12 @@ class Generation():
                 depoNum = 0
                 if r > height*5/8 or r < height*3/8:
                     if board[r][c].count('-') == 0 and [r,c] not in badlandsBList:
-                        target = random.randint(n*12,n*18)
-                        number = random.randint(n*12,n*18)
+                        target = random.randint(n,n*6)
+                        number = random.randint(n,n*6)
                         diff = abs(number-target)
                         depoNum = 0
                         if diff == 0 or diff == 1:
-                            depoNum = number*8
+                            depoNum = terNum*10/100
                 rNode = [r,c]
                 cNode = rNode
                 count = 0
@@ -167,6 +174,8 @@ class Generation():
     #this function uses notably different generative paths
     def tundra(n):
         height = n*3//5
+        landValue = 60
+        terNum = n*height*landValue//100
         board = Generation.badlands(n)
         northLine = []
         southLine = []
@@ -194,14 +203,16 @@ class Generation():
     #creates a random number of large deserts based on "desertNum"
     def desert(n):
         height = n*3//5
+        landValue = 60
+        terNum = n*height*landValue//100
         board = Generation.tundra(n)
         desertBList = []
-        desertNum = random.randint(0,3)
+        desertNum = random.randint(0,2)
         for i in range(desertNum):
             r,c = random.randint(height*3//8,height*5//8),random.randint(0,n-1)
             while board[r][c].count('-') == 1:
                 r,c = random.randint(height*3//8,height*5//8),random.randint(0,n-1)
-            depoNum = random.randint(n*30,n*40)/(2000/n)
+            depoNum = terNum*15/100
             rNode = [r,c]
             cNode = rNode
             count = 0
@@ -235,6 +246,8 @@ class Generation():
     #functions from here down do not follow a strict top-down hierarchy
     def forest(n):
         height = n*3//5
+        landValue = 60
+        terNum = n*height*landValue//100
         board = Generation.desert(n)
         forestBList = []
         for r in range(height):
@@ -243,23 +256,23 @@ class Generation():
                     if board[r][c].count('!!') == 1 or board[r][c].count('I') == 1 or board[r][c].count('@') == 1:
                         continue
                     if ((r > height*(2/3) or r < height*(1/3)) and (c > (n*3//4) or c < (n*1//4))) or ((r > height*(2/3) or r < height*(1/3)) and (c > (n*2//3) or c < (n*1//3))):
-                        target = random.randint(1,n*2)
-                        number = random.randint(1,n*2)
+                        target = random.randint(0,n*4)
+                        number = random.randint(0,n*4)
                         diff = abs(number-target)
                         depoNum = 0
-                        if diff < 3:
-                            depoNum = (number//3) - diff
+                        if diff < 2:
+                            depoNum = terNum*1/100
                         elif diff == 0:
-                            depoNum = number*2//3
+                            depoNum = terNum*3/100
                     else:
-                        target = random.randint(1,n)
-                        number = random.randint(1,n)
+                        target = random.randint(0,n*2)
+                        number = random.randint(0,n*2)
                         diff = abs(number-target)
                         depoNum = 0
-                        if diff < 3:
-                            depoNum = (number//4) - diff
+                        if diff < 2:
+                            depoNum = terNum*2/100
                         elif diff == 0:
-                            depoNum = number*2//3
+                            depoNum = terNum*4/100
                     rNode = [r,c]
                     cNode = rNode
                     count = 0
@@ -296,9 +309,78 @@ class Generation():
                             cNode = rNode
                             count += 1
         return board
-    
+    def oil(n):
+        height = n*3//5
+        landValue = 60
+        terNum = n*height*landValue//100
+        board = Generation.forest(n)
+        oilRegion = random.randint(4,7)
+        oilDepo = []
+        for i in range(oilRegion):
+            oilDepo.append(random.randint(5,9))
+            depoNum = n*height*2//100
+            r = random.randint(0,height-1)
+            c = random.randint(0,n-1)
+            if board[r][c].count('-') == 1:
+                deepWater = False
+                while deepWater == False:
+                    validCount = 0
+                    for i in range(9):
+                        for j in range(9):
+                            if board[(r+i-4)%height][(c+j-4)%n].count('+') == 1:
+                                r = random.randint(0,height-1)
+                                c = random.randint(0,n-1)
+                                continue
+                            validCount += 1
+                            if validCount == 49:
+                                deepWater = True
+                cNode = [r,c]
+                rNode = cNode
+                count = 0
+                while count < depoNum:
+                    for k in range(oilDepo[i]):
+                        a = random.randint(int(cNode[0])-1,int(cNode[0])+1)%height
+                        b = random.randint(int(cNode[1])-1,int(cNode[1])+1)%n
+                        cNode = [a,b]
+                        for k in range(depoNum//(oilDepo[i])):
+                            while board[a][b].count('@') == 0 or board[a][b].count('O') >= 1:
+                                a = random.randint(int(cNode[0])-1,int(cNode[0])+1)%height
+                                b = random.randint(int(cNode[1])-1,int(cNode[1])+1)%n
+                            cNode = [a,b]
+                        for k in range(depoNum//(oilDepo[i])):
+                            while board[a][b].count('@') == 0 or board[a][b].count('O') >= 1:
+                                a = random.randint(int(cNode[0])-1,int(cNode[0])+1)%height
+                                b = random.randint(int(cNode[1])-1,int(cNode[1])+1)%n
+                            cNode = [a,b]
+                            board[a][b].append('O')
+                            count+=1
+                        cNode = rNode
+            elif board[r][c].count('@') == 1:
+                cNode = [r,c]
+                rNode = cNode
+                count = 0
+                while count < depoNum:
+                    for k in range(oilDepo[i]):
+                        a = random.randint(int(cNode[0])-1,int(cNode[0])+1)%height
+                        b = random.randint(int(cNode[1])-1,int(cNode[1])+1)%n
+                        cNode = [a,b]
+                        for k in range(depoNum//(oilDepo[i])):
+                            while board[a][b].count('@') == 0 or board[a][b].count('O') >= 1:
+                                a = random.randint(int(cNode[0])-1,int(cNode[0])+1)%height
+                                b = random.randint(int(cNode[1])-1,int(cNode[1])+1)%n
+                            cNode = [a,b]
+                        for k in range(depoNum//(oilDepo[i])):
+                            while board[a][b].count('@') == 0 or board[a][b].count('O') >= 1:
+                                a = random.randint(int(cNode[0])-1,int(cNode[0])+1)%height
+                                b = random.randint(int(cNode[1])-1,int(cNode[1])+1)%n
+                            cNode = [a,b]
+                            board[a][b].append('O')
+                            count+=1
+                        cNode = rNode
+        return board
+
 def finalGen(n):
-    board = Generation.forest(n)
+    board = Generation.oil(n)
     return board
 '''
 is there any way to make this code more efficient?
