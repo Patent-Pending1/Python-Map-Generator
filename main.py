@@ -5,13 +5,13 @@ from Risk import Generation
 from Risk import neighbors
 from Risk import finalGen
 # generates a board form the risk.py
-n = 600
+n = 200
 board = finalGen(n)
 root = tk.Tk()
 root.title("risk")
 
 # this set the size of the square make it what ever
-square_size = 2
+square_size = 5
 
 # random tk stuff (did not steal from there webstie)
 canvas = tk.Canvas(root, width=len(board[0])*square_size, height=len(board)*square_size)
@@ -20,6 +20,8 @@ canvas.pack()
 # goes through the board
 for y, row in enumerate(board):
     for x, values in enumerate(row):
+        if values.count('O') == 1:
+            color = '#000000'
         if values.count('I') == 1:
             color = '#7390B5'
         elif values.count('-') == 1:
